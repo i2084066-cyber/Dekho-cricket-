@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CRICKET DEKHO — Admin Direct Control</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- HLS.js for Video Preview -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <style>
+    :root {
+      --bg: #070b14;
+      --card: #111827;
+      --border: rgba(255, 255, 255, 0.12);
+      --primary: #00f5a0;
+      --secondary: #00d2ff;
+      --danger: #ff2a5f;
+      --text: #ffffff;
+      --muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      padding: 20px 14px 80px 14px;
+    }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .header-bar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 16px 20px;
+      border-radius: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .brand {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .conn-pill {
+      font-size: 0.75rem;
+      padding: 5px 12px;
+      border-radius: 99px;
+      font-weight: 700;
+      background: rgba(0, 245, 160, 0.15);
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    /* Stats Grid */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+
+    .stat-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .stat-ic {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      background: rgba(0, 245, 160, 0.12);
+      color: var(--primary);
+    }
+
+    .stat-num {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.85rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .stat-lbl {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Toast Alert */
+    .alert-box {
+      display: none;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-align: center;
+      background: rgba(0, 245, 160, 0.2);
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      box-shadow: 0 0 20px rgba(0, 245, 160, 0.25);
+    }
+
+    /* Panel Card */
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .panel-title {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    input, select {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      width: 100%;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--secondary);
+    }
+
+    /* File Upload Box */
+    .upload-box {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px dashed var(--secondary);
+      padding: 12px;
+      border-radius: 10px;
+      flex-wrap: wrap;
+    }
+
+    .upload-btn {
+      background: rgba(0, 210, 255, 0.15);
+      border: 1px solid var(--secondary);
+      color: var(--secondary);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .preview-img {
+      width: 68px;
+      height: 46px;
+      border-radius: 6px;
+      object-fit: cover;
+      border: 1px solid var(--border);
+      display: none;
+    }
+
+    /* Save Button */
+    .btn-save {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: #04101c;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: transform 0.15s ease;
+      box-shadow: 0 6px 20px rgba(0, 245, 160, 0.3);
+    }
+
+    .btn-save:active {
+      transform: scale(0.98);
+    }
+
+    /* SAVED RESULT DISPLAY CARD BELOW FORM */
+    .saved-card-display {
+      background: linear-gradient(135deg, rgba(0, 245, 160, 0.08), rgba(0, 210, 255, 0.08));
+      border: 2px solid var(--primary);
+      border-radius: 16px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .saved-item-row {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .saved-thumb {
+      width: 120px;
+      height: 75px;
+      border-radius: 10px;
+      object-fit: cover;
+      border: 1px solid var(--primary);
+    }
+
+    .saved-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .saved-badge {
+      display: inline-block;
+      width: fit-content;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .saved-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-sm {
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-edit {
+      background: var(--secondary);
+      color: #000;
+    }
+
+    .btn-del {
+      background: rgba(255, 42, 95, 0.2);
+      border: 1px solid var(--danger);
+      color: var(--danger);
+    }
+
+    /* Video Preview */
+    .video-box {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      display: none;
+    }
+
+    .video-box.active {
+      display: block;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Live Users Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.82rem;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid var(--border);
+      text-align: left;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Header -->
+    <div class="header-bar">
+      <div class="brand"><i class="fa-solid fa-satellite-dish"></i> CRICKET DEKHO ADMIN</div>
+      <div class="conn-pill" id="db-conn-status"><i class="fa-solid fa-circle-check"></i> Instant Save Ready</div>
+    </div>
+
+    <!-- Live Viewers Analytics -->
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-ic"><i class="fa-solid fa-users"></i></div>
+        <div>
+          <div class="stat-num" id="live-viewers-num">0</div>
+          <div class="stat-lbl">Total Active Live Viewers</div>
+        </div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-ic" style="background:rgba(0,210,255,0.12); color:var(--secondary);"><i class="fa-solid fa-tower-broadcast"></i></div>
+        <div>
+          <div class="stat-num" id="live-state-text">READY</div>
+          <div class="stat-lbl">Current Stream Mode</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alert Message -->
+    <div id="alert-success" class="alert-box">
+      <i class="fa-solid fa-circle-check"></i> सफलतापूर्वक सेव हो गया! नीचे सेव किया हुआ डेटा देखें।
+    </div>
+
+    <!-- MAIN INPUT FORM -->
+    <div class="panel">
+      <div class="panel-title">
+        <span><i class="fa-solid fa-pen-to-square" style="color:var(--primary);"></i> Add / Edit Live Stream & Match</span>
+        <button type="button" onclick="adminApp.testStream()" style="background:rgba(0,210,255,0.15); border:1px solid var(--secondary); color:var(--secondary); padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:700; font-size:0.75rem;">
+          <i class="fa-solid fa-play"></i> Test M3U8 Play
+        </button>
+      </div>
+
+      <div class="video-box" id="preview-player-box">
+        <video id="preview-video" controls playsinline></video>
+      </div>
+
+      <div class="grid-2">
+        <!-- M3U8 Link -->
+        <div class="field full">
+          <label>1. Live M3U8 Stream Link (सिर्फ यह डालकर भी सीधा Save कर सकते हैं)</label>
+          <input type="text" id="m3u8_url" placeholder="https://example.com/live/stream.m3u8" />
+        </div>
+
+        <!-- Direct Image Upload -->
+        <div class="field full">
+          <label>2. Upload Banner / Thumbnail Photo (गैलरी से फोटो चुनें - Optional)</label>
+          <div class="upload-box">
+            <label class="upload-btn" for="banner_file">
+              <i class="fa-solid fa-cloud-arrow-up"></i> फोटो चुनें (Upload Photo)
+            </label>
+            <input type="file" id="banner_file" accept="image/*" style="display:none;" onchange="adminApp.uploadBannerFile(event)" />
+            <img id="banner_preview" class="preview-img" alt="Banner" />
+            <span id="upload_status" style="font-size:0.78rem; color:var(--muted);">कोई फोटो नहीं चुनी गई</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Match Status (Live / Upcoming)</label>
+          <select id="is_live">
+            <option value="true">LIVE (Auto-Play Stream)</option>
+            <option value="false">UPCOMING (Scheduled)</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label>Match Title (Optional)</label>
+          <input type="text" id="title" placeholder="ICC Men's T20 World Cup 2026" />
+        </div>
+
+        <div class="field">
+          <label>Teams Tagline (Optional)</label>
+          <input type="text" id="teams_tag" placeholder="IND vs NZ • Live HD" />
+        </div>
+
+        <div class="field">
+          <label>Tournament Name (Optional)</label>
+          <input type="text" id="tournament" placeholder="T20 World Cup" />
+        </div>
+
+        <!-- Optional Scores -->
+        <div class="field">
+          <label>Team A Name (Optional)</label>
+          <input type="text" id="teamA_name" placeholder="IND" />
+        </div>
+        <div class="field">
+          <label>Team A Score (Optional)</label>
+          <input type="text" id="teamA_score" placeholder="176/4" />
+        </div>
+        <div class="field">
+          <label>Team A Overs (Optional)</label>
+          <input type="text" id="teamA_overs" placeholder="19.2" />
+        </div>
+
+        <div class="field">
+          <label>Team B Name (Optional)</label>
+          <input type="text" id="teamB_name" placeholder="NZ" />
+        </div>
+        <div class="field">
+          <label>Team B Score (Optional)</label>
+          <input type="text" id="teamB_score" placeholder="148/7" />
+        </div>
+        <div class="field">
+          <label>Team B Overs (Optional)</label>
+          <input type="text" id="teamB_overs" placeholder="20.0" />
+        </div>
+
+        <div class="field full">
+          <label>Match Status Note (Optional)</label>
+          <input type="text" id="summary_note" placeholder="India needs 15 runs in 4 balls" />
+        </div>
+      </div>
+
+      <!-- MASTER SAVE BUTTON -->
+      <button type="button" class="btn-save" id="btn-save-main" onclick="adminApp.saveAllData()">
+        <i class="fa-solid fa-floppy-disk"></i> Save & Show Below
+      </button>
+    </div>
+
+    <!-- SAVED DATA DISPLAY SECTION (Save होने के बाद यहाँ नीचे दिखेगा) -->
+    <div class="saved-card-display" id="saved-display-section">
+      <div class="panel-title" style="border-bottom-color: rgba(0,245,160,0.3);">
+        <span style="color:var(--primary);"><i class="fa-solid fa-circle-check"></i> Saved & Active Broadcast on User Panel</span>
+        <span id="saved-time-lbl" style="font-size:0.75rem; color:var(--muted);">Just now</span>
+      </div>
+
+      <div class="saved-item-row" id="saved-card-body">
+        <!-- Dynamically populated after save -->
+        <div style="color:var(--muted); font-size:0.85rem;">अभी कोई स्ट्रीम सेव नहीं है। ऊपर M3U8 लिंक डालकर Save दबाएं।</div>
+      </div>
+    </div>
+
+    <!-- Active Viewers List -->
+    <div class="panel">
+      <div class="panel-title">
+        <span><i class="fa-solid fa-eye" style="color:var(--primary);"></i> Active Users Watching Right Now</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>Device</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="viewers-tbody">
+            <tr><td colspan="3" style="text-align:center; color:var(--muted);">No active viewers right now</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCS3j4lg1P5KgcxiTynXbmLDqe7QdeaKyY",
+      authDomain: "sports-26d61.firebaseapp.com",
+      databaseURL: "https://sports-26d61-default-rtdb.firebaseio.com",
+      projectId: "sports-26d61",
+      storageBucket: "sports-26d61.firebasestorage.app",
+      messagingSenderId: "742154075947",
+      appId: "1:742154075947:web:7848f0407ce244cef5cf6e"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    const db = firebase.database();
+
+    class AdminController {
+      constructor() {
+        this.base64Banner = "";
+        this.savedPayload = null;
+        this.hlsPreview = null;
+      }
+
+      init() {
+        // 1. Load from LocalStorage immediately so page never feels empty
+        const localData = localStorage.getItem('cricket_dekho_saved_stream');
+        if (localData) {
+          try {
+            const parsed = JSON.parse(localData);
+            this.savedPayload = parsed;
+            this.renderSavedBelow(parsed);
+          } catch (e) {}
+        }
+
+        // 2. Sync with Firebase Realtime Database
+        db.ref('active_broadcast').on('value', (snap) => {
+          const d = snap.val();
+          if (d) {
+            this.savedPayload = d;
+            localStorage.setItem('cricket_dekho_saved_stream', JSON.stringify(d));
+            this.renderSavedBelow(d);
+          }
+        });
+
+        // 3. Watch Live Viewers
+        db.ref('online_users').on('value', (snap) => {
+          const val = snap.val() || {};
+          const keys = Object.keys(val);
+          document.getElementById('live-viewers-num').innerText = keys.length;
+
+          const tbody = document.getElementById('viewers-tbody');
+          tbody.innerHTML = '';
+          if (keys.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--muted);">No active viewers right now</td></tr>';
+            return;
+          }
+
+          keys.forEach(k => {
+            const u = val[k];
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td><code>${u.id || k}</code></td>
+              <td>${u.device || 'Mobile'}</td>
+              <td style="color:var(--primary); font-weight:700;">● Watching Live</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        });
+      }
+
+      // Compress & Convert Uploaded Image
+      uploadBannerFile(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        document.getElementById('upload_status').innerText = "Processing photo...";
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.src = e.target.result;
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const maxW = 480;
+            const scale = maxW / img.width;
+            canvas.width = maxW;
+            canvas.height = img.height * scale;
+
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            this.base64Banner = canvas.toDataURL('image/jpeg', 0.6);
+
+            const prev = document.getElementById('banner_preview');
+            prev.src = this.base64Banner;
+            prev.style.display = 'block';
+            document.getElementById('upload_status').innerText = "फोटो तैयार है! अब Save दबाएं।";
+            document.getElementById('upload_status').style.color = "var(--primary)";
+          };
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // INSTANT NON-BLOCKING SAVE FUNCTION
+      saveAllData() {
+        const btn = document.getElementById('btn-save-main');
+        const alertBox = document.getElementById('alert-success');
+
+        const old = this.savedPayload || {};
+        const m3u8Input = document.getElementById('m3u8_url').value.trim();
+
+        const payload = {
+          m3u8_url: m3u8Input || old.m3u8_url || "",
+          banner_image: this.base64Banner || old.banner_image || "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800",
+          is_live: document.getElementById('is_live').value === "true",
+          title: document.getElementById('title').value.trim() || old.title || "ICC Men's T20 World Cup 2026",
+          teams_tag: document.getElementById('teams_tag').value.trim() || old.teams_tag || "IND vs NZ • Live HD",
+          tournament: document.getElementById('tournament').value.trim() || old.tournament || "ICC Men's T20 World Cup",
+
+          teamA_name: document.getElementById('teamA_name').value.trim() || old.teamA_name || "IND",
+          teamA_score: document.getElementById('teamA_score').value.trim() || old.teamA_score || "176/4",
+          teamA_overs: document.getElementById('teamA_overs').value.trim() || old.teamA_overs || "19.2",
+
+          teamB_name: document.getElementById('teamB_name').value.trim() || old.teamB_name || "NZ",
+          teamB_score: document.getElementById('teamB_score').value.trim() || old.teamB_score || "148/7",
+          teamB_overs: document.getElementById('teamB_overs').value.trim() || old.teamB_overs || "20.0",
+
+          summary_note: document.getElementById('summary_note').value.trim() || 
