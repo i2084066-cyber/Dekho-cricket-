@@ -61,7 +61,6 @@
       gap: 16px;
     }
 
-    /* Header */
     .app-header {
       display: flex;
       justify-content: space-between;
@@ -69,11 +68,7 @@
       padding: 4px 2px;
     }
 
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .header-brand { display: flex; align-items: center; gap: 10px; }
 
     .brand-icon {
       width: 38px;
@@ -88,18 +83,8 @@
       font-size: 1.2rem;
     }
 
-    .brand-text h1 {
-      font-family: var(--font-brand);
-      font-size: 1.3rem;
-      font-weight: 800;
-      line-height: 1.1;
-    }
-
-    .brand-text span {
-      font-size: 0.72rem;
-      color: var(--neon-green);
-      font-weight: 700;
-    }
+    .brand-text h1 { font-family: var(--font-brand); font-size: 1.3rem; font-weight: 800; line-height: 1.1; }
+    .brand-text span { font-size: 0.72rem; color: var(--neon-green); font-weight: 700; }
 
     .hdr-btn {
       width: 36px;
@@ -114,7 +99,6 @@
       cursor: pointer;
     }
 
-    /* Secure Video Player (No Link Shown) */
     .player-wrapper {
       position: relative;
       border-radius: 18px;
@@ -126,9 +110,7 @@
       display: none;
     }
 
-    .player-wrapper.active {
-      display: block;
-    }
+    .player-wrapper.active { display: block; }
 
     video#secure-video-engine {
       width: 100%;
@@ -157,7 +139,6 @@
       cursor: pointer;
     }
 
-    /* Hero Banner */
     .hero-banner {
       position: relative;
       border-radius: 20px;
@@ -187,13 +168,7 @@
       background: linear-gradient(0deg, rgba(7,11,25,0.95) 15%, rgba(7,11,25,0.2) 65%, transparent 100%);
     }
 
-    .hero-meta {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+    .hero-meta { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 6px; }
 
     .live-chip {
       align-self: flex-start;
@@ -216,23 +191,10 @@
       animation: pulse 1s infinite alternate;
     }
 
-    @keyframes pulse {
-      0% { opacity: 0.2; }
-      100% { opacity: 1; }
-    }
+    @keyframes pulse { 0% { opacity: 0.2; } 100% { opacity: 1; } }
 
-    .hero-heading {
-      font-family: var(--font-brand);
-      font-size: 1.35rem;
-      font-weight: 800;
-      line-height: 1.15;
-    }
-
-    .hero-subhead {
-      font-size: 0.8rem;
-      color: var(--neon-green);
-      font-weight: 600;
-    }
+    .hero-heading { font-family: var(--font-brand); font-size: 1.35rem; font-weight: 800; line-height: 1.15; }
+    .hero-subhead { font-size: 0.8rem; color: var(--neon-green); font-weight: 600; }
 
     .btn-play-trigger {
       background: linear-gradient(135deg, var(--neon-green), var(--primary));
@@ -250,12 +212,7 @@
       box-shadow: 0 0 15px rgba(0, 245, 160, 0.4);
     }
 
-    /* 6 Quick Action Grid */
-    .quick-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
+    .quick-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 
     .action-btn {
       background: var(--bg-card);
@@ -268,11 +225,6 @@
       text-align: center;
       gap: 6px;
       cursor: pointer;
-    }
-
-    .action-btn:active {
-      transform: scale(0.95);
-      border-color: var(--primary);
     }
 
     .action-icon {
@@ -292,34 +244,13 @@
     .ic-purple { background: rgba(121, 40, 202, 0.2); color: #a855f7; }
     .ic-cyan { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
 
-    .action-label {
-      font-weight: 700;
-      font-size: 0.8rem;
-    }
+    .action-label { font-weight: 700; font-size: 0.8rem; }
+    .action-desc { font-size: 0.65rem; color: var(--text-muted); }
 
-    .action-desc {
-      font-size: 0.65rem;
-      color: var(--text-muted);
-    }
+    .sec-header { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+    .sec-header h3 { font-family: var(--font-brand); font-size: 1.15rem; font-weight: 700; }
 
-    .sec-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 4px;
-    }
-
-    .sec-header h3 {
-      font-family: var(--font-brand);
-      font-size: 1.15rem;
-      font-weight: 700;
-    }
-
-    .tourneys-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
-    }
+    .tourneys-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
 
     .tourney-item {
       background: var(--bg-card);
@@ -333,13 +264,8 @@
       cursor: pointer;
     }
 
-    .tourney-item span {
-      font-size: 0.68rem;
-      font-weight: 700;
-      color: #cfd9e8;
-    }
+    .tourney-item span { font-size: 0.68rem; font-weight: 700; color: #cfd9e8; }
 
-    /* Match Box */
     .match-box {
       background: var(--bg-card);
       border: 1px solid var(--card-border);
@@ -360,43 +286,12 @@
       padding-bottom: 8px;
     }
 
-    .match-teams-grid {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .team-col {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      width: 40%;
-    }
-
-    .team-img {
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      border: 2px solid rgba(255, 255, 255, 0.15);
-      object-fit: cover;
-    }
-
-    .runs-text {
-      font-family: var(--font-brand);
-      font-size: 1.35rem;
-      font-weight: 800;
-    }
-
-    .overs-text {
-      font-size: 0.72rem;
-      color: var(--text-muted);
-    }
-
-    .name-text {
-      font-size: 0.75rem;
-      font-weight: 700;
-    }
+    .match-teams-grid { display: flex; align-items: center; justify-content: space-between; }
+    .team-col { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 40%; }
+    .team-img { width: 44px; height: 44px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, 0.15); object-fit: cover; }
+    .runs-text { font-family: var(--font-brand); font-size: 1.35rem; font-weight: 800; }
+    .overs-text { font-size: 0.72rem; color: var(--text-muted); }
+    .name-text { font-size: 0.75rem; font-weight: 700; }
 
     .match-note {
       text-align: center;
@@ -407,7 +302,6 @@
       border-radius: 8px;
     }
 
-    /* Info Drawer Modal */
     .drawer-modal {
       display: none;
       position: fixed;
@@ -417,11 +311,7 @@
       align-items: flex-end;
       justify-content: center;
     }
-
-    .drawer-modal.active {
-      display: flex;
-    }
-
+    .drawer-modal.active { display: flex; }
     .drawer-content {
       background: #101729;
       border-top: 2px solid var(--primary);
@@ -431,7 +321,6 @@
       padding: 20px;
     }
 
-    /* Dock Nav */
     .dock-nav {
       position: fixed;
       bottom: 0;
@@ -456,21 +345,14 @@
       font-weight: 600;
       cursor: pointer;
     }
-
-    .nav-item.active {
-      color: var(--neon-green);
-    }
-
-    .nav-item i {
-      font-size: 1.2rem;
-    }
+    .nav-item.active { color: var(--neon-green); }
+    .nav-item i { font-size: 1.2rem; }
   </style>
 </head>
 <body oncontextmenu="return false;">
 
   <div class="app-screen">
 
-    <!-- Header -->
     <header class="app-header">
       <div class="header-brand">
         <div class="brand-icon"><i class="fa-solid fa-bolt"></i></div>
@@ -640,6 +522,8 @@
   </nav>
 
   <script>
+    const DB_REST_URL = "https://sports-26d61-default-rtdb.firebaseio.com/active_broadcast.json";
+
     const firebaseConfig = {
       apiKey: "AIzaSyCS3j4lg1P5KgcxiTynXbmLDqe7QdeaKyY",
       authDomain: "sports-26d61.firebaseapp.com",
@@ -653,18 +537,41 @@
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-
     const db = firebase.database();
 
     class UserStreamEngine {
       constructor() {
         this.hls = null;
-        this._secretStream = ""; // Strictly hidden in RAM
+        this._secretStream = ""; 
         this.visitorId = 'USER_' + Math.random().toString(36).substr(2, 6).toUpperCase();
       }
 
       init() {
-        // Track Viewer Presence
+        // Track Presence
         const uRef = db.ref(`online_users/${this.visitorId}`);
         db.ref('.info/connected').on('value', (snap) => {
-          if (snap.val() ==
+          if (snap.val() === true) {
+            uRef.onDisconnect().remove();
+            uRef.set({ id: this.visitorId, device: /Mobi|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Desktop' });
+          }
+        });
+
+        // 1. Local fallback
+        this.checkLocalBackup();
+
+        // 2. Cloud REST Sync (Works reliably on GitHub Pages)
+        this.fetchFromCloudREST();
+        setInterval(() => this.fetchFromCloudREST(), 4000);
+
+        // 3. Firebase Realtime Listener
+        db.ref('active_broadcast').on('value', (snap) => {
+          const val = snap.val();
+          if (val) this.applyDataToUI(val);
+        });
+      }
+
+      async fetchFromCloudREST() {
+        try {
+          const res = await fetch(DB_REST_URL);
+          if (res.ok) {
+            
