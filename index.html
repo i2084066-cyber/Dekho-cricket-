@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>CRICKET DEKHO — Live TV HD Streaming</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+  <!-- HLS Player Library -->
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: #070b19;
+      --bg-card: rgba(18, 26, 47, 0.9);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --primary: #00d2ff;
+      --neon-green: #00f5a0;
+      --accent-red: #ff2a5f;
+      --text: #ffffff;
+      --text-muted: #8e9bb5;
+      --font-brand: 'Rajdhani', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: var(--bg-dark);
+      color: var(--text);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      padding-bottom: 85px;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(0, 210, 255, 0.08), transparent 35%),
+        radial-gradient(circle at 90% 90%, rgba(121, 40, 202, 0.08), transparent 35%);
+    }
+
+    .app-screen {
+      max-width: 440px;
+      margin: 0 auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* Header */
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 2px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      background: linear-gradient(135deg, var(--neon-green), var(--primary));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 12px rgba(0, 245, 160, 0.4);
+      color: #05101e;
+      font-size: 1.2rem;
+    }
+
+    .brand-text h1 {
+      font-family: var(--font-brand);
+      font-size: 1.3rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .brand-text span {
+      font-size: 0.72rem;
+      color: var(--neon-green);
+      font-weight: 700;
+    }
+
+    .hdr-btn {
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      cursor: pointer;
+    }
+
+    /* Secure Video Player (No Link Shown) */
+    .player-wrapper {
+      position: relative;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 2px solid var(--neon-green);
+      box-shadow: 0 0 25px rgba(0, 245, 160, 0.3);
+      background: #000;
+      aspect-ratio: 16 / 9;
+      display: none;
+    }
+
+    .player-wrapper.active {
+      display: block;
+    }
+
+    video#secure-video-engine {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
+    .player-top-bar {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      display: flex;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    .ctrl-pill {
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      padding: 5px 12px;
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* Hero Banner */
+    .hero-banner {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      background: #0c1222;
+      aspect-ratio: 16 / 10;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 16px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .hero-banner img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.6;
+    }
+
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(0deg, rgba(7,11,25,0.95) 15%, rgba(7,11,25,0.2) 65%, transparent 100%);
+    }
+
+    .hero-meta {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .live-chip {
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--accent-red);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 99px;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      background: #fff;
+      border-radius: 50%;
+      animation: pulse 1s infinite alternate;
+    }
+
+    @keyframes pulse {
+      0% { opacity: 0.2; }
+      100% { opacity: 1; }
+    }
+
+    .hero-heading {
+      font-family: var(--font-brand);
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1.15;
+    }
+
+    .hero-subhead {
+      font-size: 0.8rem;
+      color: var(--neon-green);
+      font-weight: 600;
+    }
+
+    .btn-play-trigger {
+      background: linear-gradient(135deg, var(--neon-green), var(--primary));
+      color: #05101e;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 99px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      width: fit-content;
+      box-shadow: 0 0 15px rgba(0, 245, 160, 0.4);
+    }
+
+    /* 6 Quick Action Grid */
+    .quick-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .action-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 12px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .action-btn:active {
+      transform: scale(0.95);
+      border-color: var(--primary);
+    }
+
+    .action-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+    }
+
+    .ic-red { background: rgba(255, 42, 95, 0.15); color: #ff2a5f; }
+    .ic-green { background: rgba(0, 245, 160, 0.15); color: #00f5a0; }
+    .ic-blue { background: rgba(0, 210, 255, 0.15); color: #00d2ff; }
+    .ic-yellow { background: rgba(255, 184, 0, 0.15); color: #ffb800; }
+    .ic-purple { background: rgba(121, 40, 202, 0.2); color: #a855f7; }
+    .ic-cyan { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+
+    .action-label {
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    .action-desc {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+    }
+
+    .sec-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .sec-header h3 {
+      font-family: var(--font-brand);
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .tourneys-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .tourney-item {
+      background: var(--bg-card);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .tourney-item span {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #cfd9e8;
+    }
+
+    /* Match Box */
+    .match-box {
+      background: var(--bg-card);
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .match-box-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 8px;
+    }
+
+    .match-teams-grid {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .team-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      width: 40%;
+    }
+
+    .team-img {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      object-fit: cover;
+    }
+
+    .runs-text {
+      font-family: var(--font-brand);
+      font-size: 1.35rem;
+      font-weight: 800;
+    }
+
+    .overs-text {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .name-text {
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .match-note {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--neon-green);
+      background: rgba(0, 245, 160, 0.08);
+      padding: 6px;
+      border-radius: 8px;
+    }
+
+    /* Info Drawer Modal */
+    .drawer-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 2000;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .drawer-modal.active {
+      display: flex;
+    }
+
+    .drawer-content {
+      background: #101729;
+      border-top: 2px solid var(--primary);
+      border-radius: 20px 20px 0 0;
+      width: 100%;
+      max-width: 440px;
+      padding: 20px;
+    }
+
+    /* Dock Nav */
+    .dock-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(9, 14, 29, 0.95);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid var(--card-border);
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      z-index: 999;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-muted);
+      font-size: 0.68rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--neon-green);
+    }
+
+    .nav-item i {
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body oncontextmenu="return false;">
+
+  <div class="app-screen">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-icon"><i class="fa-solid fa-bolt"></i></div>
+        <div class="brand-text">
+          <h1>Cricket Live TV</h1>
+          <span>HD STREAMING</span>
+        </div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <div class="hdr-btn" onclick="clientApp.openFeature('Search', 'Live Cricket HD Streaming Active.')"><i class="fa-solid fa-magnifying-glass"></i></div>
+        <div class="hdr-btn" onclick="clientApp.openFeature('Alerts', 'Match notifications enabled.')"><i class="fa-regular fa-bell"></i></div>
+      </div>
+    </header>
+
+    <!-- Protected Video Player -->
+    <div class="player-wrapper" id="player-frame">
+      <div class="player-top-bar">
+        <button class="ctrl-pill" onclick="clientApp.toggleMute()"><i class="fa-solid fa-volume-high" id="mute-ic"></i> Audio</button>
+        <button class="ctrl-pill" onclick="clientApp.closePlayer()"><i class="fa-solid fa-xmark"></i> Close</button>
+      </div>
+      <video id="secure-video-engine" playsinline controls controlsList="nodownload noplaybackrate"></video>
+    </div>
+
+    <!-- Hero Banner -->
+    <section class="hero-banner">
+      <img id="banner-poster" src="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800" alt="Banner" />
+      <div class="hero-overlay"></div>
+      <div class="hero-meta">
+        <div class="live-chip" id="chip-status"><span class="pulse-dot"></span> LIVE</div>
+        <div class="hero-heading" id="banner-title">ICC Men's T20 World Cup 2026</div>
+        <div class="hero-subhead" id="banner-teams">IND vs NZ • Live HD</div>
+        <button class="btn-play-trigger" onclick="clientApp.startPlayback(false)">
+          <i class="fa-solid fa-play"></i> Watch Live Now
+        </button>
+      </div>
+    </section>
+
+    <!-- 6 Quick Action Buttons -->
+    <div class="quick-grid">
+      <div class="action-btn" onclick="clientApp.startPlayback(false)">
+        <div class="action-icon ic-red"><i class="fa-solid fa-tv"></i></div>
+        <div class="action-label">Live TV</div>
+        <div class="action-desc">Watch Live Cricket</div>
+      </div>
+      <div class="action-btn" onclick="clientApp.jumpToScore()">
+        <div class="action-icon ic-green"><i class="fa-solid fa-chart-simple"></i></div>
+        <div class="action-label">Live Scores</div>
+        <div class="action-desc">Realtime Updates</div>
+      </div>
+      <div class="action-btn" onclick="clientApp.openFeature('Upcoming Fixtures', '• IND vs AUS — Tomorrow 7:30 PM\n• ENG vs SA — Sunday 3:30 PM')">
+        <div class="action-icon ic-blue"><i class="fa-regular fa-calendar-days"></i></div>
+        <div class="action-label">Fixtures</div>
+        <div class="action-desc">Upcoming Matches</div>
+      </div>
+      <div class="action-btn" onclick="clientApp.openFeature('Match Results', '• IND beat NZ by 24 runs\n• AUS beat ENG by 5 wickets')">
+        <div class="action-icon ic-yellow"><i class="fa-solid fa-trophy"></i></div>
+        <div class="action-label">Results</div>
+        <div class="action-desc">Match Results</div>
+      </div>
+      <div class="action-btn" onclick="clientApp.openFeature('Active Series', '• ICC Men T20 World Cup\n• Asia Cup\n• TATA IPL 2026')">
+        <div class="action-icon ic-purple"><i class="fa-solid fa-layer-group"></i></div>
+        <div class="action-label">Series</div>
+        <div class="action-desc">Tournaments & Series</div>
+      </div>
+      <div class="action-btn" onclick="clientApp.openFeature('Cricket News', '• India continues dominant streak in T20 series.')">
+        <div class="action-icon ic-cyan"><i class="fa-regular fa-newspaper"></i></div>
+        <div class="action-label">News</div>
+        <div class="action-desc">Latest Stories</div>
+      </div>
+    </div>
+
+    <!-- Trending Tournaments -->
+    <div class="sec-header">
+      <h3>Trending Tournaments</h3>
+    </div>
+    <div class="tourneys-row">
+      <div class="tourney-item" onclick="clientApp.startPlayback(false)">
+        <i class="fa-solid fa-trophy" style="color:var(--primary); font-size:1.2rem;"></i>
+        <span>ICC T20 WC</span>
+      </div>
+      <div class="tourney-item" onclick="clientApp.startPlayback(false)">
+        <i class="fa-solid fa-earth-asia" style="color:#ffb800; font-size:1.2rem;"></i>
+        <span>Asia Cup</span>
+      </div>
+      <div class="tourney-item" onclick="clientApp.startPlayback(false)">
+        <i class="fa-solid fa-fire" style="color:var(--neon-green); font-size:1.2rem;"></i>
+        <span>IPL 2026</span>
+      </div>
+      <div class="tourney-item" onclick="clientApp.startPlayback(false)">
+        <i class="fa-solid fa-shield-halved" style="color:var(--accent-red); font-size:1.2rem;"></i>
+        <span>BBL 2026</span>
+      </div>
+    </div>
+
+    <!-- Live Match Card -->
+    <div class="sec-header">
+      <h3>Live Match <span style="color:var(--accent-red); font-size:0.75rem;">●</span></h3>
+    </div>
+
+    <div class="match-box" id="match-card-target" onclick="clientApp.startPlayback(false)">
+      <div class="match-box-head">
+        <span id="score-tourney">ICC Men's T20 World Cup</span>
+        <span style="color:var(--neon-green);">Tap to Watch Live</span>
+      </div>
+
+      <div class="match-teams-grid">
+        <div class="team-col">
+          <img src="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=80" class="team-img" id="img-teamA" />
+          <div class="runs-text" id="score-teamA">176/4</div>
+          <div class="overs-text" id="overs-teamA">(19.2 ov)</div>
+          <div class="name-text" id="name-teamA">IND</div>
+        </div>
+
+        <div style="text-align:center;">
+          <div class="live-chip" style="font-size:0.6rem; padding:2px 8px;"><span class="pulse-dot"></span> LIVE</div>
+          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:700; display:block; margin-top:4px;">VS</span>
+        </div>
+
+        <div class="team-col">
+          <img src="https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=80" class="team-img" id="img-teamB" />
+          <div class="runs-text" id="score-teamB">148/7</div>
+          <div class="overs-text" id="overs-teamB">(20.0 ov)</div>
+          <div class="name-text" id="name-teamB">NZ</div>
+        </div>
+      </div>
+
+      <div class="match-note" id="score-note">
+        Live Match in Progress
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Feature Drawer Modal -->
+  <div class="drawer-modal" id="feature-drawer" onclick="clientApp.closeFeature()">
+    <div class="drawer-content" onclick="event.stopPropagation()">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h3 id="drawer-title" style="font-family:var(--font-brand); font-size:1.3rem; color:var(--neon-green);">Info</h3>
+        <button onclick="clientApp.closeFeature()" style="background:none; border:none; color:#fff; font-size:1.2rem; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <p id="drawer-body" style="font-size:0.9rem; line-height:1.6; white-space:pre-line; color:#d1d5db;"></p>
+    </div>
+  </div>
+
+  <!-- Bottom Dock -->
+  <nav class="dock-nav">
+    <div class="nav-item active" onclick="window.scrollTo({top:0, behavior:'smooth'})">
+      <i class="fa-solid fa-house"></i>
+      <span>Home</span>
+    </div>
+    <div class="nav-item" onclick="clientApp.openFeature('Series', '• ICC Men T20 World Cup\n• TATA IPL 2026\n• Asia Cup')">
+      <i class="fa-solid fa-layer-group"></i>
+      <span>Series</span>
+    </div>
+    <div class="nav-item" onclick="clientApp.openFeature('News', '• Live HD streaming powered by Cricket Dekho.')">
+      <i class="fa-regular fa-newspaper"></i>
+      <span>News</span>
+    </div>
+    <div class="nav-item" onclick="clientApp.openFeature('Stats', '• Most Runs: V. Kohli\n• Most Wickets: J. Bumrah')">
+      <i class="fa-solid fa-chart-line"></i>
+      <span>Stats</span>
+    </div>
+    <div class="nav-item" onclick="clientApp.openFeature('More', '• Stream Quality: Auto HD\n• Version: Cricket Dekho Pro')">
+      <i class="fa-solid fa-bars"></i>
+      <span>More</span>
+    </div>
+  </nav>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCS3j4lg1P5KgcxiTynXbmLDqe7QdeaKyY",
+      authDomain: "sports-26d61.firebaseapp.com",
+      databaseURL: "https://sports-26d61-default-rtdb.firebaseio.com",
+      projectId: "sports-26d61",
+      storageBucket: "sports-26d61.firebasestorage.app",
+      messagingSenderId: "742154075947",
+      appId: "1:742154075947:web:7848f0407ce244cef5cf6e"
+    };
+
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    const db = firebase.database();
+
+    class UserStreamEngine {
+      constructor() {
+        this.hls = null;
+        this._secretStream = ""; // Strictly hidden in RAM
+        this.visitorId = 'USER_' + Math.random().toString(36).substr(2, 6).toUpperCase();
+      }
+
+      init() {
+        // Track Viewer Presence
+        const uRef = db.ref(`online_users/${this.visitorId}`);
+        db.ref('.info/connected').on('value', (snap) => {
+          if (snap.val() ==
