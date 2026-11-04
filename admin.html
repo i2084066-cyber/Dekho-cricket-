@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CRICKET DEKHO — Admin Direct Control</title>
+  <title>CRICKET DEKHO — GitHub Cloud Admin</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -15,7 +15,6 @@
 
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <style>
@@ -30,11 +29,7 @@
       --muted: #94a3b8;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background: var(--bg);
@@ -74,7 +69,7 @@
 
     .conn-pill {
       font-size: 0.75rem;
-      padding: 5px 12px;
+      padding: 6px 12px;
       border-radius: 99px;
       font-weight: 700;
       background: rgba(0, 245, 160, 0.15);
@@ -82,7 +77,6 @@
       border: 1px solid var(--primary);
     }
 
-    /* Stats Grid */
     .stats-row {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -124,21 +118,28 @@
       margin-top: 4px;
     }
 
-    /* Toast Alert */
     .alert-box {
       display: none;
       padding: 14px 18px;
       border-radius: 12px;
       font-weight: 700;
-      font-size: 0.95rem;
-      text-align: center;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .alert-success {
       background: rgba(0, 245, 160, 0.2);
       border: 2px solid var(--primary);
       color: var(--primary);
-      box-shadow: 0 0 20px rgba(0, 245, 160, 0.25);
+      text-align: center;
     }
 
-    /* Panel Card */
+    .alert-error {
+      background: rgba(255, 42, 95, 0.2);
+      border: 2px solid var(--danger);
+      color: #ff99b3;
+    }
+
     .panel {
       background: var(--card);
       border: 1px solid var(--border);
@@ -166,21 +167,10 @@
       gap: 14px;
     }
 
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.full { grid-column: 1 / -1; }
 
-    .field.full {
-      grid-column: 1 / -1;
-    }
-
-    label {
-      font-size: 0.8rem;
-      color: var(--muted);
-      font-weight: 600;
-    }
+    label { font-size: 0.8rem; color: var(--muted); font-weight: 600; }
 
     input, select {
       background: rgba(0, 0, 0, 0.45);
@@ -193,11 +183,8 @@
       width: 100%;
     }
 
-    input:focus, select:focus {
-      border-color: var(--secondary);
-    }
+    input:focus, select:focus { border-color: var(--secondary); }
 
-    /* File Upload Box */
     .upload-box {
       display: flex;
       align-items: center;
@@ -232,7 +219,6 @@
       display: none;
     }
 
-    /* Save Button */
     .btn-save {
       background: linear-gradient(135deg, var(--primary), var(--secondary));
       color: #04101c;
@@ -246,15 +232,9 @@
       align-items: center;
       justify-content: center;
       gap: 10px;
-      transition: transform 0.15s ease;
       box-shadow: 0 6px 20px rgba(0, 245, 160, 0.3);
     }
 
-    .btn-save:active {
-      transform: scale(0.98);
-    }
-
-    /* SAVED RESULT DISPLAY CARD BELOW FORM */
     .saved-card-display {
       background: linear-gradient(135deg, rgba(0, 245, 160, 0.08), rgba(0, 210, 255, 0.08));
       border: 2px solid var(--primary);
@@ -298,11 +278,7 @@
       color: #fff;
     }
 
-    .saved-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+    .saved-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 
     .btn-sm {
       padding: 8px 14px;
@@ -316,18 +292,9 @@
       gap: 6px;
     }
 
-    .btn-edit {
-      background: var(--secondary);
-      color: #000;
-    }
+    .btn-edit { background: var(--secondary); color: #000; }
+    .btn-del { background: rgba(255, 42, 95, 0.2); border: 1px solid var(--danger); color: var(--danger); }
 
-    .btn-del {
-      background: rgba(255, 42, 95, 0.2);
-      border: 1px solid var(--danger);
-      color: var(--danger);
-    }
-
-    /* Video Preview */
     .video-box {
       width: 100%;
       aspect-ratio: 16 / 9;
@@ -337,47 +304,26 @@
       border: 1px solid var(--border);
       display: none;
     }
-
-    .video-box.active {
-      display: block;
-    }
-
-    video {
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Live Users Table */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.82rem;
-    }
-
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid var(--border);
-      text-align: left;
-    }
-
-    th {
-      color: var(--muted);
-      font-size: 0.72rem;
-      text-transform: uppercase;
-    }
+    .video-box.active { display: block; }
+    video { width: 100%; height: 100%; }
   </style>
 </head>
 <body>
 
   <div class="container">
 
-    <!-- Header -->
     <div class="header-bar">
-      <div class="brand"><i class="fa-solid fa-satellite-dish"></i> CRICKET DEKHO ADMIN</div>
-      <div class="conn-pill" id="db-conn-status"><i class="fa-solid fa-circle-check"></i> Instant Save Ready</div>
+      <div class="brand"><i class="fa-solid fa-satellite-dish"></i> CRICKET DEKHO CLOUD ADMIN</div>
+      <div class="conn-pill" id="cloud-status"><i class="fa-solid fa-spinner fa-spin"></i> Checking Cloud...</div>
     </div>
 
-    <!-- Live Viewers Analytics -->
+    <!-- Error / Success Boxes -->
+    <div id="alert-success" class="alert-box alert-success">
+      <i class="fa-solid fa-circle-check"></i> Cloud पर सफलतापूर्वक सेव हो गया! सभी मोबाइल यूजर्स पर स्ट्रीम लाइव है।
+    </div>
+    <div id="alert-error" class="alert-box alert-error"></div>
+
+    <!-- Analytics -->
     <div class="stats-row">
       <div class="stat-box">
         <div class="stat-ic"><i class="fa-solid fa-users"></i></div>
@@ -395,15 +341,10 @@
       </div>
     </div>
 
-    <!-- Alert Message -->
-    <div id="alert-success" class="alert-box">
-      <i class="fa-solid fa-circle-check"></i> सफलतापूर्वक सेव हो गया! नीचे सेव किया हुआ डेटा देखें।
-    </div>
-
-    <!-- MAIN INPUT FORM -->
+    <!-- Input Form -->
     <div class="panel">
       <div class="panel-title">
-        <span><i class="fa-solid fa-pen-to-square" style="color:var(--primary);"></i> Add / Edit Live Stream & Match</span>
+        <span><i class="fa-solid fa-pen-to-square" style="color:var(--primary);"></i> Setup Live Stream (GitHub Ready)</span>
         <button type="button" onclick="adminApp.testStream()" style="background:rgba(0,210,255,0.15); border:1px solid var(--secondary); color:var(--secondary); padding:6px 12px; border-radius:6px; cursor:pointer; font-weight:700; font-size:0.75rem;">
           <i class="fa-solid fa-play"></i> Test M3U8 Play
         </button>
@@ -414,13 +355,19 @@
       </div>
 
       <div class="grid-2">
-        <!-- M3U8 Link -->
         <div class="field full">
-          <label>1. Live M3U8 Stream Link (सिर्फ यह डालकर भी सीधा Save कर सकते हैं)</label>
+          <label>1. Live M3U8 Stream Link (HTTPS लिंक डालें या नीचे Proxy ऑन करें)</label>
           <input type="text" id="m3u8_url" placeholder="https://example.com/live/stream.m3u8" />
         </div>
 
-        <!-- Direct Image Upload -->
+        <div class="field full">
+          <label>अगर आपका M3U8 लिंक HTTP:// (बिना S के) है, तो GitHub के लिए इसे ON करें:</label>
+          <select id="use_proxy">
+            <option value="false">Direct Play (HTTPS M3U8 लिंक के लिए बेस्ट)</option>
+            <option value="true">Enable HTTPS Proxy (अगर HTTP:// लिंक GitHub पर न चले)</option>
+          </select>
+        </div>
+
         <div class="field full">
           <label>2. Upload Banner / Thumbnail Photo (गैलरी से फोटो चुनें - Optional)</label>
           <div class="upload-box">
@@ -434,7 +381,7 @@
         </div>
 
         <div class="field">
-          <label>Match Status (Live / Upcoming)</label>
+          <label>Match Status</label>
           <select id="is_live">
             <option value="true">LIVE (Auto-Play Stream)</option>
             <option value="false">UPCOMING (Scheduled)</option>
@@ -456,7 +403,6 @@
           <input type="text" id="tournament" placeholder="T20 World Cup" />
         </div>
 
-        <!-- Optional Scores -->
         <div class="field">
           <label>Team A Name (Optional)</label>
           <input type="text" id="teamA_name" placeholder="IND" />
@@ -489,49 +435,27 @@
         </div>
       </div>
 
-      <!-- MASTER SAVE BUTTON -->
       <button type="button" class="btn-save" id="btn-save-main" onclick="adminApp.saveAllData()">
-        <i class="fa-solid fa-floppy-disk"></i> Save & Show Below
+        <i class="fa-solid fa-floppy-disk"></i> Save & Broadcast to Cloud
       </button>
     </div>
 
-    <!-- SAVED DATA DISPLAY SECTION (Save होने के बाद यहाँ नीचे दिखेगा) -->
+    <!-- SAVED CARD BELOW -->
     <div class="saved-card-display" id="saved-display-section">
       <div class="panel-title" style="border-bottom-color: rgba(0,245,160,0.3);">
-        <span style="color:var(--primary);"><i class="fa-solid fa-circle-check"></i> Saved & Active Broadcast on User Panel</span>
-        <span id="saved-time-lbl" style="font-size:0.75rem; color:var(--muted);">Just now</span>
+        <span style="color:var(--primary);"><i class="fa-solid fa-circle-check"></i> Saved & Active Broadcast</span>
+        <span id="saved-time-lbl" style="font-size:0.75rem; color:var(--muted);">Ready</span>
       </div>
-
       <div class="saved-item-row" id="saved-card-body">
-        <!-- Dynamically populated after save -->
-        <div style="color:var(--muted); font-size:0.85rem;">अभी कोई स्ट्रीम सेव नहीं है। ऊपर M3U8 लिंक डालकर Save दबाएं।</div>
-      </div>
-    </div>
-
-    <!-- Active Viewers List -->
-    <div class="panel">
-      <div class="panel-title">
-        <span><i class="fa-solid fa-eye" style="color:var(--primary);"></i> Active Users Watching Right Now</span>
-      </div>
-      <div style="overflow-x:auto;">
-        <table>
-          <thead>
-            <tr>
-              <th>User ID</th>
-              <th>Device</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="viewers-tbody">
-            <tr><td colspan="3" style="text-align:center; color:var(--muted);">No active viewers right now</td></tr>
-          </tbody>
-        </table>
+        <div style="color:var(--muted); font-size:0.85rem;">Loading saved stream...</div>
       </div>
     </div>
 
   </div>
 
   <script>
+    const DB_REST_URL = "https://sports-26d61-default-rtdb.firebaseio.com/active_broadcast.json";
+
     const firebaseConfig = {
       apiKey: "AIzaSyCS3j4lg1P5KgcxiTynXbmLDqe7QdeaKyY",
       authDomain: "sports-26d61.firebaseapp.com",
@@ -545,7 +469,6 @@
     if (!firebase.apps.length) {
       firebase.initializeApp(firebaseConfig);
     }
-
     const db = firebase.database();
 
     class AdminController {
@@ -555,96 +478,98 @@
         this.hlsPreview = null;
       }
 
-      init() {
-        // 1. Load from LocalStorage immediately so page never feels empty
-        const localData = localStorage.getItem('cricket_dekho_saved_stream');
-        if (localData) {
+      async init() {
+        // Check local first
+        const local = localStorage.getItem('cricket_dekho_saved_stream');
+        if (local) {
           try {
-            const parsed = JSON.parse(localData);
-            this.savedPayload = parsed;
-            this.renderSavedBelow(parsed);
+            this.savedPayload = JSON.parse(local);
+            this.renderSavedBelow(this.savedPayload);
           } catch (e) {}
         }
 
-        // 2. Sync with Firebase Realtime Database
-        db.ref('active_broadcast').on('value', (snap) => {
-          const d = snap.val();
-          if (d) {
-            this.savedPayload = d;
-            localStorage.setItem('cricket_dekho_saved_stream', JSON.stringify(d));
-            this.renderSavedBelow(d);
+        // Check Cloud REST API (Works on GitHub Pages)
+        try {
+          const res = await fetch(DB_REST_URL);
+          const statusPill = document.getElementById('cloud-status');
+          if (res.status === 401 || res.status === 403) {
+            statusPill.innerHTML = '<i class="fa-solid fa-lock"></i> Firebase Rules Locked!';
+            statusPill.style.color = 'var(--danger)';
+            statusPill.style.borderColor = 'var(--danger)';
+            this.showRulesWarning();
+          } else {
+            statusPill.innerHTML = '<i class="fa-solid fa-cloud"></i> GitHub Cloud Connected';
+            const cloudData = await res.json();
+            if (cloudData) {
+              this.savedPayload = cloudData;
+              this.renderSavedBelow(cloudData);
+            }
           }
-        });
+        } catch (err) {}
 
-        // 3. Watch Live Viewers
+        // Live Viewers listener
         db.ref('online_users').on('value', (snap) => {
           const val = snap.val() || {};
-          const keys = Object.keys(val);
-          document.getElementById('live-viewers-num').innerText = keys.length;
-
-          const tbody = document.getElementById('viewers-tbody');
-          tbody.innerHTML = '';
-          if (keys.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--muted);">No active viewers right now</td></tr>';
-            return;
-          }
-
-          keys.forEach(k => {
-            const u = val[k];
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-              <td><code>${u.id || k}</code></td>
-              <td>${u.device || 'Mobile'}</td>
-              <td style="color:var(--primary); font-weight:700;">● Watching Live</td>
-            `;
-            tbody.appendChild(tr);
-          });
+          document.getElementById('live-viewers-num').innerText = Object.keys(val).length;
         });
       }
 
-      // Compress & Convert Uploaded Image
+      showRulesWarning() {
+        const errBox = document.getElementById('alert-error');
+        errBox.style.display = 'block';
+        errBox.innerHTML = `
+          <strong>⚠️ ज़रूरी सूचना (GitHub पर चलाने के लिए):</strong><br/>
+          आपके Firebase Realtime Database के <b>Rules</b> अभी लॉक हैं! इसलिए GitHub पर दूसरे फोन्स में डेटा नहीं जा पा रहा है।<br/>
+          1. <a href="https://console.firebase.google.com/project/sports-26d61/database/sports-26d61-default-rtdb/rules" target="_blank" style="color:#00f5a0; text-decoration:underline;">यहाँ क्लिक करके सीधे अपने Firebase Rules खोलें</a><br/>
+          2. वहां <code>".read": true, ".write": true</code> लिखकर <b>Publish</b> दबा दें।
+        `;
+      }
+
       uploadBannerFile(event) {
         const file = event.target.files[0];
         if (!file) return;
-
-        document.getElementById('upload_status').innerText = "Processing photo...";
-
         const reader = new FileReader();
         reader.onload = (e) => {
           const img = new Image();
           img.src = e.target.result;
           img.onload = () => {
             const canvas = document.createElement('canvas');
-            const maxW = 480;
+            const maxW = 420;
             const scale = maxW / img.width;
             canvas.width = maxW;
             canvas.height = img.height * scale;
-
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-            this.base64Banner = canvas.toDataURL('image/jpeg', 0.6);
+            this.base64Banner = canvas.toDataURL('image/jpeg', 0.55);
 
             const prev = document.getElementById('banner_preview');
             prev.src = this.base64Banner;
             prev.style.display = 'block';
-            document.getElementById('upload_status').innerText = "फोटो तैयार है! अब Save दबाएं।";
+            document.getElementById('upload_status').innerText = "फोटो तैयार है!";
             document.getElementById('upload_status').style.color = "var(--primary)";
           };
         };
         reader.readAsDataURL(file);
       }
 
-      // INSTANT NON-BLOCKING SAVE FUNCTION
-      saveAllData() {
+      async saveAllData() {
         const btn = document.getElementById('btn-save-main');
         const alertBox = document.getElementById('alert-success');
-
         const old = this.savedPayload || {};
-        const m3u8Input = document.getElementById('m3u8_url').value.trim();
+
+        let rawUrl = document.getElementById('m3u8_url').value.trim() || old.m3u8_url || "";
+        const useProxy = document.getElementById('use_proxy').value === "true";
+
+        // If user enabled HTTPS Proxy for HTTP stream on GitHub Pages
+        let finalStreamUrl = rawUrl;
+        if (useProxy && rawUrl.startsWith("http://")) {
+          finalStreamUrl = "https://corsproxy.io/?" + encodeURIComponent(rawUrl);
+        }
 
         const payload = {
-          m3u8_url: m3u8Input || old.m3u8_url || "",
+          m3u8_url: finalStreamUrl,
+          raw_m3u8: rawUrl,
+          use_proxy: useProxy,
           banner_image: this.base64Banner || old.banner_image || "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?w=800",
           is_live: document.getElementById('is_live').value === "true",
           title: document.getElementById('title').value.trim() || old.title || "ICC Men's T20 World Cup 2026",
@@ -659,4 +584,17 @@
           teamB_score: document.getElementById('teamB_score').value.trim() || old.teamB_score || "148/7",
           teamB_overs: document.getElementById('teamB_overs').value.trim() || old.teamB_overs || "20.0",
 
-          summary_note: document.getElementById('summary_note').value.trim() || 
+          summary_note: document.getElementById('summary_note').value.trim() || old.summary_note || "Live Match in Progress",
+          updatedAt: new Date().toLocaleTimeString()
+        };
+
+        this.savedPayload = payload;
+        try { localStorage.setItem('cricket_dekho_saved_stream', JSON.stringify(payload)); } catch (e) {}
+        this.renderSavedBelow(payload);
+
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving to Cloud...';
+
+        try {
+          const res = await fetch(DB_REST_URL, {
+            method: "PUT",
+            headers: { "Content-Type": "application/jso
